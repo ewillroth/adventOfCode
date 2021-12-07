@@ -879,14 +879,4 @@ const lastWinner = {
 	27: false,
 };
 
-calls.forEach((number) => (lastWinner[number] = true));
-console.log(lastWinner);
-
 const lastCall = 89;
-
-const reducer = (previousValue, currentValue) => +previousValue + +currentValue;
-console.log(
-	Object.keys(lastWinner)
-		.filter((val) => lastWinner[val] === false)
-		.reduce(reducer)
-);
