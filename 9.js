@@ -24,149 +24,203 @@ rows.forEach((row, rowIndex) => {
 
 console.log('part 1', answer);
 
-const newRows = rows.map((row) =>
-	row.split('').map((val) => {
+/***** Part Two ******/
+
+const testInput = `2199943210
+3987894921
+9856789892
+8767896789
+9899965678`;
+
+// const newRows = testInput.split('\n').map((row) => {
+// 	const newRow = row.split('').map((val) => {
+// 		if (val !== '9') return '.';
+// 		return val;
+// 	});
+// 	if (newRow.length) {
+// 		newRow.push(9);
+// 		newRow.unshift(9);
+// 	}
+// 	return newRow;
+// });
+
+const newRows = rows.map((row) => {
+	const newRow = row.split('').map((val) => {
 		if (val !== '9') return '.';
 		return val;
-	})
-);
-console.log(newRows);
+	});
+	return newRow;
+});
 
-const markAbove = (rowIndex, positionIndex, basinNumber) => {
+const mark = (rowIndex, positionIndex, direction, marker) => {
 	if (rowIndex === undefined || positionIndex === undefined) return;
-	const above = newRows?.[rowIndex - 1]?.[positionIndex];
-	if (above === '9') {
+	let next;
+	switch (direction) {
+		case 'up':
+			next = newRows?.[rowIndex - 1]?.[positionIndex];
+			break;
+		case 'right':
+			next = newRows?.[rowIndex]?.[positionIndex + 1];
+			break;
+		case 'down':
+			next = newRows?.[rowIndex + 1]?.[positionIndex];
+			break;
+		case 'left':
+			next = newRows?.[rowIndex]?.[positionIndex - 1];
+			break;
+	}
+	if (next == '9') {
 		return;
-	} else if (above === '.') {
-		newRows[rowIndex - 1][positionIndex] = basinNumber;
-		markAbove(rowIndex - 1, positionIndex, basinNumber);
+	} else if (next === '.') {
+		switch (direction) {
+			case 'up':
+				newRows[rowIndex - 1][positionIndex] = marker;
+				mark(rowIndex - 1, positionIndex, direction, marker);
+				break;
+			case 'right':
+				newRows[rowIndex][positionIndex + 1] = marker;
+				mark(rowIndex, positionIndex + 1, direction, marker);
+				break;
+			case 'down':
+				newRows[rowIndex + 1][positionIndex] = marker;
+				mark(rowIndex + 1, positionIndex, direction, marker);
+				break;
+			case 'left':
+				newRows[rowIndex][positionIndex - 1] = marker;
+				mark(rowIndex, positionIndex - 1, direction, marker);
+				break;
+		}
 	} else {
-		console.log('above pt 3');
 		return;
 	}
 };
 
-const markBelow = (rowIndex, positionIndex, basinNumber) => {
-	if (rowIndex === undefined || positionIndex === undefined) return;
-	const below = newRows?.[rowIndex + 1]?.[positionIndex];
-	if (below === '9') {
+const markEachSpot = (rowIndex, positionIndex, marker) => {
+	const spotValue = newRows[rowIndex][positionIndex];
+	if (spotValue == '9') {
 		return;
-	} else if (below === '.') {
-		newRows[rowIndex + 1][positionIndex] = basinNumber;
-		markBelow(rowIndex + 1, positionIndex, basinNumber);
 	} else {
-		console.log('below pt 3');
-		return;
+		newRows[rowIndex][positionIndex] = marker;
+		mark(rowIndex, positionIndex, 'up', marker);
+		mark(rowIndex, positionIndex, 'right', marker);
+		mark(rowIndex, positionIndex, 'down', marker);
+		mark(rowIndex, positionIndex, 'left', marker);
 	}
 };
 
-const markRight = (rowIndex, positionIndex, basinNumber) => {
+const search = (rowIndex, positionIndex, direction) => {
 	if (rowIndex === undefined || positionIndex === undefined) return;
-	const right = newRows?.[rowIndex]?.[positionIndex + 1];
-	if (right === '9') {
-		return;
-	} else if (right === '.') {
-		newRows[rowIndex][positionIndex + 1] = basinNumber;
-		markRight(rowIndex, positionIndex + 1, basinNumber);
-	} else {
-		console.log('right pt 3');
-		return;
+	let basinNumber;
+	switch (direction) {
+		case 'up':
+			if (!basinNumber)
+				basinNumber = newRows?.[rowIndex - 1]?.[positionIndex];
+			break;
+		case 'right':
+			if (!basinNumber)
+				basinNumber = newRows?.[rowIndex]?.[positionIndex + 1];
+			break;
+		case 'down':
+			if (!basinNumber)
+				basinNumber = newRows?.[rowIndex + 1]?.[positionIndex];
+			break;
+		case 'left':
+			if (!basinNumber)
+				basinNumber = newRows?.[rowIndex]?.[positionIndex - 1];
+			break;
 	}
+	if (basinNumber == '9') {
+		return undefined;
+	} else if (basinNumber === '.') {
+		switch (direction) {
+			case 'up':
+				basinNumber = search(rowIndex - 1, positionIndex, direction);
+				break;
+			case 'right':
+				basinNumber = search(rowIndex, positionIndex + 1, direction);
+				break;
+			case 'down':
+				basinNumber = search(rowIndex + 1, positionIndex, direction);
+				break;
+			case 'left':
+				basinNumber = search(rowIndex, positionIndex - 1, direction);
+				break;
+		}
+	}
+	return basinNumber;
 };
 
-const markLeft = (rowIndex, positionIndex, basinNumber) => {
-	if (rowIndex === undefined || positionIndex === undefined) return;
-	const left = newRows?.[rowIndex]?.[positionIndex - 1];
-	if (left === '9') {
-		return;
-	} else if (left === '.') {
-		newRows[rowIndex][positionIndex - 1] = basinNumber;
-		markLeft(rowIndex, positionIndex - 1, basinNumber);
-	} else {
-		console.log('left pt 3');
-		return;
-	}
-};
-
-const findBasin = (rowIndex, positionIndex) => {
+const echoLocator = (rowIndex, positionIndex) => {
 	const val = newRows[rowIndex][positionIndex];
-	if (val === '9') {
-		return;
-	} else if (val === '.') {
-		newRows[rowIndex][positionIndex] = basinNumber;
+	let basinNumber;
+	if (val === '.') {
+		if (!basinNumber) basinNumber = search(rowIndex, positionIndex, 'up');
+		if (!basinNumber)
+			basinNumber = search(rowIndex, positionIndex, 'right');
+		if (!basinNumber) basinNumber = search(rowIndex, positionIndex, 'down');
+		if (!basinNumber) basinNumber = search(rowIndex, positionIndex, 'left');
+	} else {
+		return val;
 	}
-	markAbove(rowIndex, positionIndex);
-	markRight(rowIndex, positionIndex);
-	markBelow(rowIndex, positionIndex);
-	markLeft(rowIndex, positionIndex);
-};
-
-const markBasin = (rowIndex, positionIndex) => {
-	const val = newRows[rowIndex][positionIndex];
-	if (val === '9') {
-		return;
-	} else if (val === '.') {
-		newRows[rowIndex][positionIndex] = basinNumber;
-	}
-	markAbove(rowIndex, positionIndex);
-	markRight(rowIndex, positionIndex);
-	markBelow(rowIndex, positionIndex);
-	markLeft(rowIndex, positionIndex);
+	return basinNumber;
 };
 
 fs.writeFileSync('9_basins.txt', newRows.map((row) => row.join('')).join('\n'));
 
-let countByLetters = (letter) => {
-	if (!letter) return 'a';
-	if (letter == 'a') return 'b';
-	if (letter == 'b') return 'c';
-	if (letter == 'c') return 'd';
-	if (letter == 'd') return 'e';
-	if (letter == 'e') return 'f';
-	if (letter == 'f') return 'g';
-	if (letter == 'g') return 'h';
-	if (letter == 'h') return 'i';
-	if (letter == 'i') return 'j';
-	if (letter == 'j') return 'k';
-	if (letter == 'k') return 'l';
-	if (letter == 'l') return 'm';
-	if (letter == 'm') return 'n';
-	if (letter == 'n') return 'o';
-	if (letter == 'o') return 'p';
-	if (letter == 'p') return 'q';
-	if (letter == 'q') return 'r';
-	if (letter == 'r') return 's';
-	if (letter == 's') return 't';
-	if (letter == 't') return 'u';
-	if (letter == 'u') return 'v';
-	if (letter == 'v') return 'w';
-	if (letter == 'w') return 'x';
-	if (letter == 'x') return 'y';
-	if (letter == 'y') return 'z';
-	if (letter == 'z') return '0';
-	if (letter == '0') return '1';
-	if (letter == '1') return '2';
-	if (letter == '2') return '3';
-	if (letter == '3') return '4';
-	if (letter == '4') return '5';
-	if (letter == '5') return '6';
-	if (letter == '6') return '7';
-	if (letter == '7') return '8';
-};
+let nextMarker = 1;
 
 newRows.forEach((row, rowIndex) => {
 	row.forEach((position, positionIndex) => {
-		const rowNumber = findBasin(rowIndex, positionIndex);
+		const existingBasin = echoLocator(rowIndex, positionIndex);
+		console.log(existingBasin);
+		// console.log(letter);
+		if (existingBasin == '9') {
+			fs.writeFileSync(
+				`./steps/9_${rowIndex}_${positionIndex}.txt`,
+				newRows.map((row) => row.join('')).join('\n')
+			);
+			return;
+		}
+		if (!existingBasin) {
+			markEachSpot(rowIndex, positionIndex, nextMarker);
+			nextMarker++;
+			fs.writeFileSync(
+				`./steps/9_${rowIndex}_${positionIndex}.txt`,
+				newRows.map((row) => row.join('')).join('\n')
+			);
+		} else {
+			markEachSpot(rowIndex, positionIndex, existingBasin);
+			fs.writeFileSync(
+				`./steps/9_${rowIndex}_${positionIndex}.txt`,
+				newRows.map((row) => row.join('')).join('\n')
+			);
+		}
 	});
 });
 
-console.log(newRows);
+// console.log(newRows[0].map((val) => (val == '9' ? '.' : val)).join(''));
+// console.log(newRows[1].map((val) => (val == '9' ? '.' : val)).join(''));
+// console.log(newRows[2].map((val) => (val == '9' ? '.' : val)).join(''));
+// console.log(newRows[3].map((val) => (val == '9' ? '.' : val)).join(''));
+// console.log(newRows[4].map((val) => (val == '9' ? '.' : val)).join(''));
 
-fs.writeFileSync(
-	'9_letters.txt',
-	newRows.map((row) => row.join('')).join('\n')
-);
+const totals = {};
 
+newRows.forEach((row) => {
+	row.forEach((val) => {
+		if (!totals[val]) {
+			totals[val] = 1;
+		} else {
+			totals[val] = totals[val] + 1;
+		}
+	});
+});
+
+console.log(totals);
+const sums = Object.values(totals).sort((a, b) => b - a);
+console.log('part 2', +sums[1] * +sums[2] * +sums[3]);
+console.log('part 2', sums[1], sums[2], sums[3]);
 // for each point, search all sides (until you hit a 9) for a number/letter
 // mark each side with the number/letter found
 // increase the default letter only when an existing letter is not found
+// 72
