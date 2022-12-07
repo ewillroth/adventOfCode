@@ -40,11 +40,11 @@ const parseCommands = (input) => {
 
   const dirList = ['~'];
 
-  const testCommands = input.trim().split('\n');
+  const commands = input.trim().split('\n');
 
   let path = '~';
 
-  testCommands.forEach((command) => {
+  commands.forEach((command) => {
     if (command === '$ cd /') {
       // move to root
       path = '~';
