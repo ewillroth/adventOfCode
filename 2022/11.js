@@ -110,14 +110,112 @@ const partOne = () => {
 /////////////////////
 /////////////////////
 
-const checkDivisible = () => {
-  // is this something?
-  // https://www.cs.cornell.edu/andru/mathclub/handouts/Divisibility#:~:text=For%20big%20numbers%2C%20alternately%20add,so%20is%20the%20whole%20number
+const alternativelyAddAndSubtract = (bigInt) => {
+  const asString = bigInt.toString();
+  const array = asString.split('');
+  const final = array.reduce((prev, current, currentIndex) => {
+    if (currentIndex % 2 === 0) {
+      return +prev + +current;
+    } else {
+      return +prev - current;
+    }
+  }, 0);
+  return BigInt(final);
 };
 
-function gcd(...numbers) {
+const canReduce = (bigIntArray) => {
+  // https://www.cs.cornell.edu/andru/mathclub/handouts/Divisibility#:~:text=For%20big%20numbers%2C%20alternately%20add,so%20is%20the%20whole%20number
+  // 2 If the last digit is even, the number is divisible by 2.
+  if (
+    bigIntArray.filter((bigInt) => {
+      const asString = bigInt.toString();
+      if (asString[asString.length - 1] === '2') return true;
+      return false;
+    }).length === bigIntArray.length
+  ) {
+    return 2n;
+  }
+  // 3 If the sum of the digits is divisible by 3, the number is also.
+  // 4 If the last two digits form a number divisible by 4, the number is also.
+  if (
+    bigIntArray.filter((bigInt) => {
+      const asString = bigInt.toString();
+      if (
+        +asString[asString.length - 1] +
+          (+asString[asString.length - 2] % 4) ===
+        0
+      )
+        return true;
+      return false;
+    }).length === bigIntArray.length
+  ) {
+    return 4n;
+  }
+  // 5 If the last digit is a 5 or a 0, the number is divisible by 5.
+  if (
+    bigIntArray.filter((bigInt) => {
+      const asString = bigInt.toString();
+      if (
+        asString[asString.length - 1] === '5' ||
+        asString[asString.length - 1] === '0'
+      )
+        return true;
+      return false;
+    }).length === bigIntArray.length
+  ) {
+    return 5n;
+  }
+  // 6 If the number is divisible by both 3 and 2, it is also divisible by 6.
+  /* 7
+	Take the last digit, double it, and subtract it from the rest of the number;
+	if the answer is divisible by 7 (including 0), then the number is also. For big numbers, alternately
+	add and subtract digits in groups of three. If the answer is divisible by 7, the number is too. For
+	example 256242 is divisible by 7 because 256-242 = 14.
+	*/
+  /* 8 If the last three digits form a number divisible by 8, then so is the whole number.
+	Double the hundreds’ digit, add the tens’ digits, double again and add the ones’ digit. If this is
+	divisible by eight, so is the whole number. */
+  // 9 If the sum of the digits is divisible by 9, the number is also.
+  // 10 If the number ends in 0, it is divisible by 10.
+  if (
+    bigIntArray.filter((bigInt) => {
+      const asString = bigInt.toString();
+      if (asString[asString.length - 1] === '0') return true;
+      return false;
+    }).length === bigIntArray.length
+  ) {
+    return 10n;
+  }
+  /* 11 Alternately add and subtract the digits from left to right. (You can think of the first digit as being
+	'added' to zero.) If the result (including 0) is divisible by 11, the number is also.
+	Example: to see whether 365167484 is divisible by 11, start by subtracting:
+	3-6+5-1+6-7+4-8+4 = 0; therefore 365167484 is divisible by 11. For big numbers, you can also
+	alternately add and subtract digits in groups of three. If the answer is divisible by 11, the number is
+	too. */
+  if (
+    bigIntArray.filter((bigInt) => {
+      alternativelyAddAndSubtract(bigInt) % 11n === 0n;
+    }).length === bigIntArray.length
+  ) {
+    return 11n;
+  }
+  // 12 If the number is divisible by both 3 and 4, it is also divisible by 12.
+  /* 13 Remove the last digit from the number, then add 4 times the removed digit from the remaining
+	number. If what is left is divisible by 13, then so is the original number.
+	For big numbers, alternately add and subtract digits in groups of three, just like with 7. If the
+	answer is divisible by 13, the number is too. */
+  /* 17 Remove the last digit from the number, then subtract 5 times the removed digit from the remaining
+	number. If what is left is divisible by 17, then so is the original number. */
+  /* 19 Add twice the last digit to the remaining number. If the result is divisible by 19, so is the original
+	number. */
+
+  // nothing
+  return 1n;
+};
+
+const gcd = (...numbers) => {
   return numbers.reduce((a, b) => (b === 0n ? a : gcd(b, a % b)));
-}
+};
 
 const buildMonkeyTrackerWithBigInt = (input) => {
   let nextId = 0;
@@ -163,6 +261,13 @@ const buildMonkeyTrackerWithBigInt = (input) => {
 
 const playRoundExtraWorried = (monkeyTracker, round) => {
   if (round) console.log(`rd: ${round}`);
+  const allTestValues = Object.values(monkeyTracker)
+    .map((monkey) => {
+      if (monkey.id === undefined) return 1n;
+      return monkey.testCondition;
+    })
+    .reduce((prev, current) => prev * current, 1n);
+  console.log(allTestValues);
   Object.keys(monkeyTracker).forEach((monkey) => {
     console.log(
       `before rd:${monkeyTracker[monkey].id} inspected ${monkeyTracker[monkey].itemsInspected}`
@@ -188,9 +293,10 @@ const playRoundExtraWorried = (monkeyTracker, round) => {
       }
     }
   });
-  const divideBy = gcd(...Object.values(monkeyTracker.items));
-  console.log('divideBy', divideBy);
-  monkeyTracker.items = monkeyTracker.items.map((val) => val / divideBy);
+  // const divideBy = canReduce(monkeyTracker.items);
+  // console.log('divideBy', divideBy);
+  // monkeyTracker.items = monkeyTracker.items.map((val) => val / allTestValues);
+  monkeyTracker.items = monkeyTracker.items.map((val) => val % allTestValues);
 };
 
 const partTwo = () => {
@@ -209,7 +315,7 @@ const partTwo = () => {
 
 const testCasePartTwo = () => {
   const testMonkeyTracker = buildMonkeyTrackerWithBigInt(testInput);
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 1001; i++) {
     playRoundExtraWorried(testMonkeyTracker, i + 1);
   }
   const sortedInspectionCounts = Object.values(testMonkeyTracker)
@@ -217,10 +323,9 @@ const testCasePartTwo = () => {
       return monkey.itemsInspected;
     })
     .sort((a, b) => b - a);
-  console.log(sortedInspectionCounts[0] * sortedInspectionCounts[1]);
 };
 
-// partTwo();
+partTwo();
 // 14400720005 is too low
 
-testCasePartTwo();
+// testCasePartTwo();
