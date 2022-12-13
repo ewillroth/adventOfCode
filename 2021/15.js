@@ -2,32 +2,32 @@
 
 const fs = require('fs');
 
-const input = fs.readFileSync('./15_input.txt', 'utf-8');
+const input = fs.readFileSync('./2021/15_input.txt', 'utf-8');
 
 const newRiskOne = (string) => {
-	if (+string === 9) return '1';
-	return +string + 1 + '';
+  if (+string === 9) return '1';
+  return +string + 1 + '';
 };
 
 const newRiskTwo = (string) => {
-	if (+string === 9) return '2';
-	if (+string === 8) return '1';
-	return +string + 2 + '';
+  if (+string === 9) return '2';
+  if (+string === 8) return '1';
+  return +string + 2 + '';
 };
 
 const newRiskThree = (string) => {
-	if (+string === 9) return '3';
-	if (+string === 8) return '2';
-	if (+string === 7) return '1';
-	return +string + 3 + '';
+  if (+string === 9) return '3';
+  if (+string === 8) return '2';
+  if (+string === 7) return '1';
+  return +string + 3 + '';
 };
 
 const newRiskFour = (string) => {
-	if (+string === 9) return '4';
-	if (+string === 8) return '3';
-	if (+string === 7) return '2';
-	if (+string === 6) return '1';
-	return +string + 4 + '';
+  if (+string === 9) return '4';
+  if (+string === 8) return '3';
+  if (+string === 7) return '2';
+  if (+string === 6) return '1';
+  return +string + 4 + '';
 };
 
 const testInput = `1163751742
@@ -44,153 +44,154 @@ const testInput = `1163751742
 const rows = input.split('\n');
 const data = rows.map((row) => row.split(''));
 const moreColumns = data.map((row) => {
-	return [
-		...row,
-		...row.map((val) => newRiskOne(val)),
-		...row.map((val) => newRiskTwo(val)),
-		...row.map((val) => newRiskThree(val)),
-		...row.map((val) => newRiskFour(val)),
-	];
+  return [
+    ...row,
+    ...row.map((val) => newRiskOne(val)),
+    ...row.map((val) => newRiskTwo(val)),
+    ...row.map((val) => newRiskThree(val)),
+    ...row.map((val) => newRiskFour(val)),
+  ];
 });
 const actualData = [
-	...moreColumns,
-	...moreColumns.map((row) => row.map((val) => newRiskOne(val))),
-	...moreColumns.map((row) => row.map((val) => newRiskTwo(val))),
-	...moreColumns.map((row) => row.map((val) => newRiskThree(val))),
-	...moreColumns.map((row) => row.map((val) => newRiskFour(val))),
+  ...moreColumns,
+  ...moreColumns.map((row) => row.map((val) => newRiskOne(val))),
+  ...moreColumns.map((row) => row.map((val) => newRiskTwo(val))),
+  ...moreColumns.map((row) => row.map((val) => newRiskThree(val))),
+  ...moreColumns.map((row) => row.map((val) => newRiskFour(val))),
 ];
 
 console.log(actualData[actualData.length - 1]);
 const points = [];
 
 actualData.forEach((row, rowIndex) => {
-	row.forEach((val, valIndex) => {
-		points.push(`${rowIndex},${valIndex}`);
-	});
+  row.forEach((val, valIndex) => {
+    points.push(`${rowIndex},${valIndex}`);
+  });
 });
 
 const start = points[0];
 const end = points[points.length - 1];
 
-console.log(start, end);
+console.log('start', start);
+console.log('end', end);
 
 class Graph {
-	constructor() {
-		this.nodes = [];
-		this.adjacencyList = {};
-	}
+  constructor() {
+    this.nodes = [];
+    this.adjacencyList = {};
+  }
 
-	addNode(node) {
-		this.nodes.push(node);
-		this.adjacencyList[node] = [];
-	}
+  addNode(node) {
+    this.nodes.push(node);
+    this.adjacencyList[node] = [];
+  }
 
-	addEdge(node1, node2, weight) {
-		this.adjacencyList[node1].push({ node: node2, weight: weight });
-		// this.adjacencyList[node2].push({ node: node1, weight: weight });
-	}
+  addEdge(node1, node2, weight) {
+    this.adjacencyList[node1].push({ node: node2, weight: weight });
+    // this.adjacencyList[node2].push({ node: node1, weight: weight });
+  }
 
-	findPathWithDijkstra(startNode, endNode) {
-		let times = {};
-		let backtrace = {};
-		let pq = new PriorityQueue();
+  findPathWithDijkstra(startNode, endNode) {
+    let times = {};
+    let backtrace = {};
+    let pq = new PriorityQueue();
 
-		times[startNode] = 0;
+    times[startNode] = 0;
 
-		this.nodes.forEach((node) => {
-			if (node !== startNode) {
-				times[node] = Infinity;
-			}
-		});
+    this.nodes.forEach((node) => {
+      if (node !== startNode) {
+        times[node] = Infinity;
+      }
+    });
 
-		pq.enqueue([startNode, 0]);
-		while (!pq.isEmpty()) {
-			let shortestStep = pq.dequeue();
-			let currentNode = shortestStep[0];
-			this.adjacencyList[currentNode].forEach((neighbor) => {
-				let time = times[currentNode] + neighbor.weight;
-				if (time < times[neighbor.node]) {
-					times[neighbor.node] = time;
-					backtrace[neighbor.node] = currentNode;
-					pq.enqueue([neighbor.node, time]);
-				}
-			});
-		}
-		let path = [endNode];
-		let lastStep = endNode;
-		while (lastStep !== startNode) {
-			path.unshift(backtrace[lastStep]);
-			lastStep = backtrace[lastStep];
-		}
-		console.log(`Path is ${path} and time is ${times[endNode]}`);
-		return `Path is ${path} and time is ${times[endNode]}`;
-	}
+    pq.enqueue([startNode, 0]);
+    while (!pq.isEmpty()) {
+      let shortestStep = pq.dequeue();
+      let currentNode = shortestStep[0];
+      this.adjacencyList[currentNode].forEach((neighbor) => {
+        let time = times[currentNode] + neighbor.weight;
+        if (time < times[neighbor.node]) {
+          times[neighbor.node] = time;
+          backtrace[neighbor.node] = currentNode;
+          pq.enqueue([neighbor.node, time]);
+        }
+      });
+    }
+    let path = [endNode];
+    let lastStep = endNode;
+    while (lastStep !== startNode) {
+      path.unshift(backtrace[lastStep]);
+      lastStep = backtrace[lastStep];
+    }
+    console.log(`Path is ${path} and time is ${times[endNode]}`);
+    return `Path is ${path} and time is ${times[endNode]}`;
+  }
 }
 
 let map = new Graph();
 
 points.forEach((point) => {
-	map.addNode(point);
+  map.addNode(point);
 });
 
 points.forEach((point) => {
-	const currentX = +point.split(',')[0];
-	const currentY = +point.split(',')[1];
+  const currentX = +point.split(',')[0];
+  const currentY = +point.split(',')[1];
 
-	const nextOptions = [
-		`${currentX - 1},${currentY}`,
-		`${currentX + 1},${currentY}`,
-		`${currentX},${currentY - 1}`,
-		`${currentX},${currentY + 1}`,
-	].filter((option) => {
-		if (
-			+option.split(',')[0] < 0 ||
-			+option.split(',')[1] < 0 ||
-			+option.split(',')[0] > end.split(',')[0] ||
-			+option.split(',')[1] > end.split(',')[1]
-		) {
-			return false;
-		}
-		return true;
-	});
+  const nextOptions = [
+    `${currentX - 1},${currentY}`,
+    `${currentX + 1},${currentY}`,
+    `${currentX},${currentY - 1}`,
+    `${currentX},${currentY + 1}`,
+  ].filter((option) => {
+    if (
+      +option.split(',')[0] < 0 ||
+      +option.split(',')[1] < 0 ||
+      +option.split(',')[0] > end.split(',')[0] ||
+      +option.split(',')[1] > end.split(',')[1]
+    ) {
+      return false;
+    }
+    return true;
+  });
 
-	nextOptions.forEach((nextOption) => {
-		map.addEdge(
-			point,
-			nextOption,
-			+actualData[+nextOption.split(',')[0]][+nextOption.split(',')[1]]
-		);
-	});
+  nextOptions.forEach((nextOption) => {
+    map.addEdge(
+      point,
+      nextOption,
+      +actualData[+nextOption.split(',')[0]][+nextOption.split(',')[1]]
+    );
+  });
 });
 
 class PriorityQueue {
-	constructor() {
-		this.collection = [];
-	}
-	enqueue(element) {
-		if (this.isEmpty()) {
-			this.collection.push(element);
-		} else {
-			let added = false;
-			for (let i = 1; i <= this.collection.length; i++) {
-				if (element[1] < this.collection[i - 1][1]) {
-					this.collection.splice(i - 1, 0, element);
-					added = true;
-					break;
-				}
-			}
-			if (!added) {
-				this.collection.push(element);
-			}
-		}
-	}
-	dequeue() {
-		let value = this.collection.shift();
-		return value;
-	}
-	isEmpty() {
-		return this.collection.length === 0;
-	}
+  constructor() {
+    this.collection = [];
+  }
+  enqueue(element) {
+    if (this.isEmpty()) {
+      this.collection.push(element);
+    } else {
+      let added = false;
+      for (let i = 1; i <= this.collection.length; i++) {
+        if (element[1] < this.collection[i - 1][1]) {
+          this.collection.splice(i - 1, 0, element);
+          added = true;
+          break;
+        }
+      }
+      if (!added) {
+        this.collection.push(element);
+      }
+    }
+  }
+  dequeue() {
+    let value = this.collection.shift();
+    return value;
+  }
+  isEmpty() {
+    return this.collection.length === 0;
+  }
 }
 
 map.findPathWithDijkstra(start, end);
