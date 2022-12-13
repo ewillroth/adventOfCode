@@ -150,7 +150,7 @@ const partOne = () => {
     } else {
       to = to.charCodeAt(0);
     }
-    if (Math.abs(to - from) > 1) {
+    if (to - from > 1) {
       return false; // x (120) to z (122)
     }
     return true; // z (122) to x (120)
