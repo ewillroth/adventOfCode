@@ -142,25 +142,18 @@ const partOne = () => {
   const canMoveTo = (from, to) => {
     if (from === 'S') {
       from = 'a'.charCodeAt(0);
-    } else if (from === 'E') {
-      from = 'z'.charCodeAt(0);
     } else {
       from = from.charCodeAt(0);
     }
     if (to === 'E') {
       to = 'z'.charCodeAt(0);
-    } else if (to === 'S') {
-      to = 'a'.charCodeAt(0);
     } else {
       to = to.charCodeAt(0);
     }
     if (Math.abs(to - from) > 1) {
-      return false;
+      return false; // x (120) to z (122)
     }
-    if (Math.abs(from - to) > 1) {
-      return false;
-    }
-    return true;
+    return true; // z (122) to x (120)
   };
 
   let graph = new Graph();
