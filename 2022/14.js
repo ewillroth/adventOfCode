@@ -103,7 +103,7 @@ const partOne = (input) => {
   let sandLocation = sandStartingPoint;
 
   const moveSand = (sandLocation) => {
-    console.log(`moving sand from ${sandLocation}`);
+    console.log(`moving sand ${sandLocation}`);
     try {
       const [sandX, sandY] = sandLocation.split(',');
       // console.log('sandX', sandX, 'sandY', sandY);
