@@ -113,20 +113,14 @@ const findNumbers = (line) => {
     }
   });
 
-  //   console.log(firstNum, "firstNum index");
-  //   console.log(lastNum, "lastNum index");
-  //   console.log(firstNumValue, "firstNumValue");
-  //   console.log(lastNumValue, "lastNumValue");
   if (firstNumValue === 0 || lastNumValue === 0) throw new Error("WTF");
   return [firstNumValue, lastNumValue];
 };
 
 const lines2 = input.split("\n");
-console.log(lines2.length);
 lines2.forEach((line) => {
   const [num1, num2] = findNumbers(line);
   const num = num1.toString() + num2.toString();
-  //   console.log(num);
   answer2 += +num;
 });
 
