@@ -1,9 +1,9 @@
-const fs = require('fs');
-const dotenv = require('dotenv');
+const fs = require("fs");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
-const axios = require('axios');
+const axios = require("axios");
 
 axios
   .get(
@@ -22,5 +22,14 @@ axios
     );
   })
   .catch((error) => {
-    console.log(error.response.data, 'error');
+    console.log(error.response.data, "error");
   });
+
+fs.copyFileSync(
+  `parseInput.js`,
+  `./${process.env.YEAR}/${process.env.DAY}.js`,
+  fs.constants.COPYFILE_EXCL,
+  (err) => {
+    if (err) console.log(`${err} - copying parseInput`);
+  }
+);
