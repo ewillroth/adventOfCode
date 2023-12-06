@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "bun:start": "bun index.js",
     "start:node": "node --max-old-space-size=10192 index.js",
     "input": "node input.js"
   },
