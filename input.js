@@ -17,7 +17,7 @@ axios
   .then((response) => {
     const data = response.data;
     fs.writeFileSync(
-      `./${process.env.YEAR}/${process.env.DAY}_input.txt`,
+      `./${process.env.YEAR}/inputs/${process.env.DAY}_input.txt`,
       data
     );
   })

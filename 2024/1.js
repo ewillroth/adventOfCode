@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 const input = fs.readFileSync(
-  `./${process.env.YEAR}/${process.env.DAY}_input.txt`,
+  `./${process.env.YEAR}/inputs/${process.env.DAY}_input.txt`,
   "utf-8"
 );
 
