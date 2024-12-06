@@ -8,3 +8,10 @@ const input = fs.readFileSync(
 const lines = input.trim().split("\n");
 
 const testInput = ``;
+
+const one = (input) => {};
+const two = (input) => {};
+
+one();
+
+two();
